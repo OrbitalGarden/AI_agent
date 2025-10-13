@@ -10,4 +10,4 @@ wheels/
 .venv
 
 #API keys and passwords
-/home/orbit/workspace/github.com/OrbitalGarden/AI_agent/API_key.env
+*.env
