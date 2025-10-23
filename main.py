@@ -1,12 +1,11 @@
 import os
 import sys
+
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
-from functions.get_files_info import schema_get_files_info
-from functions.get_file_content import schema_get_file_content
-from functions.run_python_file import schema_run_python_file
-from functions.write_file import schema_write_file
+from available_functions import available_functions
+from functions.call_function import call_function
 
 def main():
 
@@ -35,16 +34,8 @@ def main():
 
     All paths you provide should be relative to the working directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons.
     If the output of the prompt would be an error, wait 1 second and try again no more than 10 times.
+    \n means that you should add a line break insted of writing \n
     """
-
-    available_functions = types.Tool(
-        function_declarations=[
-            schema_get_files_info,
-            schema_get_file_content,
-            schema_run_python_file,
-            schema_write_file
-        ]
-    )
 
     user_prompt = " ".join(args)
     verbose = True if "--verbose" in sys.argv else False
@@ -63,7 +54,11 @@ def main():
 
     if response.function_calls != []:
         for function_call in response.function_calls:
-            print(f"Calling function: {function_call.name}({function_call.args})")
+            function_call_result = call_function(function_call, verbose)
+            if function_call_result.parts[0].function_response.response and verbose:
+                print(f"-> {function_call_result.parts[0].function_response.response}")
+            if not hasattr(function_call_result.parts[0].function_response, "response"):
+                raise SystemExit
     else:
         print(response.text)
     if verbose:

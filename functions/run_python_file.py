@@ -58,7 +58,7 @@ def run_python_file(working_directory, file_path, args=[]):
         if output == []:
             return "No output produced."
         
-        return "/n".join(output)
+        return "\n".join(output)
 
     except Exception as e:
         return f"Error: resultuting Python file: {e}"
